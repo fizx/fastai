@@ -291,7 +291,7 @@ class Learner():
         self.sched = LR_Finder(layer_opt, len(self.data.trn_dl), lr, linear=True)
         return self.fit_gen(self.model, self.data, layer_opt, 1)
 
-    def lr_find(self, start_lr=1e-5, end_lr=10, wds=None, linear=False, **kwargs):
+    def lr_find(self, start_lr=1e-5, end_lr=10, wds=None, linear=False, sample=1.0, **kwargs):
         """Helps you find an optimal learning rate for a model.
 
          It uses the technique developed in the 2015 paper
@@ -304,6 +304,8 @@ class Learner():
                 to specify learning rates for a learner's layer_groups
             end_lr (float) : The maximum learning rate to try.
             wds (iterable/float)
+            sample (float) : The fraction of the dataset to use.  Set lower to
+                speed up large datasets.
 
         Examples:
             As training moves us closer to the optimal weights for a model,
@@ -326,7 +328,7 @@ class Learner():
         """
         self.save('tmp')
         layer_opt = self.get_layer_opt(start_lr, wds)
-        self.sched = LR_Finder(layer_opt, len(self.data.trn_dl), end_lr, linear=linear)
+        self.sched = LR_Finder(layer_opt, int(len(self.data.trn_dl) * sample), end_lr, linear=linear)
         self.fit_gen(self.model, self.data, layer_opt, 1, **kwargs)
         self.load('tmp')
 
